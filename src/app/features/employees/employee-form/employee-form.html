@@ -1,0 +1,324 @@
+
+<div class="min-h-screen space-y-6 bg-slate-50 p-4 sm:p-6 lg:p-8">
+
+  <!-- Header -->
+  <div>
+    <div class="mb-2 flex items-center gap-2 text-sm text-slate-500">
+      <a routerLink="/dashboard" class="hover:text-blue-600">Dashboard</a>
+      <span>/</span>
+      <a routerLink="/employees" class="hover:text-blue-600">Employees</a>
+      <span>/</span>
+      <span class="font-semibold text-blue-600">
+        {{ isEditMode ? 'Edit Employee' : 'Add Employee' }}
+      </span>
+    </div>
+
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">
+      {{ isEditMode ? 'Edit Employee' : 'Add New Employee' }}
+    </h1>
+
+    <p class="mt-2 text-sm text-slate-500">
+      {{ isEditMode
+        ? 'Update the employee information below.'
+        : 'Enter the employee information to register a new employee.' }}
+    </p>
+  </div>
+
+  <!-- Loading -->
+  @if (loadingEmployee) {
+    <div class="rounded-xl border border-slate-200 bg-white p-10 text-center">
+      <div class="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"></div>
+      <p class="mt-3 text-sm text-slate-500">Loading employee details...</p>
+    </div>
+  }
+
+  @else {
+
+    <!-- Form Card -->
+    <div class="max-w-4xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+      <div class="border-b border-slate-200 px-6 py-5">
+        <h2 class="text-lg font-bold text-slate-900">
+          Employee Information
+        </h2>
+        <p class="mt-1 text-sm text-slate-500">
+          All fields are required.
+        </p>
+      </div>
+
+      <form
+        [formGroup]="employeeForm"
+        (ngSubmit)="submitForm()"
+        class="space-y-6 p-6">
+
+        <!-- Success -->
+        @if (successMessage) {
+          <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">
+            {{ successMessage }}
+          </div>
+        }
+
+        <!-- Error -->
+        @if (errorMessage) {
+          <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Employee Code -->
+        <div>
+          <label for="employeeCode" class="mb-2 block text-sm font-semibold text-slate-700">
+            Employee Code <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="employeeCode"
+            type="text"
+            formControlName="employeeCode"
+            placeholder="e.g. EMP-1001"
+            maxlength="50"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            [class.border-red-500]="f.employeeCode.invalid && f.employeeCode.touched">
+
+          @if (f.employeeCode.hasError('required') && f.employeeCode.touched) {
+            <p class="mt-1 text-xs text-red-600">Employee code is required.</p>
+          }
+        </div>
+
+        <!-- First and Last Name -->
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          <div>
+            <label for="firstName" class="mb-2 block text-sm font-semibold text-slate-700">
+              First Name <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              placeholder="Enter first name"
+              maxlength="100"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="f.firstName.invalid && f.firstName.touched">
+
+            @if (f.firstName.hasError('required') && f.firstName.touched) {
+              <p class="mt-1 text-xs text-red-600">First name is required.</p>
+            }
+          </div>
+
+          <div>
+            <label for="lastName" class="mb-2 block text-sm font-semibold text-slate-700">
+              Last Name <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="Enter last name"
+              maxlength="100"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="f.lastName.invalid && f.lastName.touched">
+
+            @if (f.lastName.hasError('required') && f.lastName.touched) {
+              <p class="mt-1 text-xs text-red-600">Last name is required.</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="employee@company.com"
+            maxlength="255"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            [class.border-red-500]="f.email.invalid && f.email.touched">
+
+          @if (f.email.hasError('required') && f.email.touched) {
+            <p class="mt-1 text-xs text-red-600">Email is required.</p>
+          }
+
+          @if (f.email.hasError('email') && f.email.touched) {
+            <p class="mt-1 text-xs text-red-600">Enter a valid email address.</p>
+          }
+        </div>
+
+        <!-- Country -->
+        <div>
+          <label for="country" class="mb-2 block text-sm font-semibold text-slate-700">
+            Country <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            id="country"
+            type="text"
+            formControlName="country"
+            placeholder="Enter country"
+            maxlength="100"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            [class.border-red-500]="f.country.invalid && f.country.touched">
+
+          @if (f.country.hasError('required') && f.country.touched) {
+            <p class="mt-1 text-xs text-red-600">Country is required.</p>
+          }
+        </div>
+        
+<!-- Salary Information -->
+<div class="border-t border-slate-200 pt-6">
+
+  <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-bold text-slate-900">
+        Salary Information
+      </h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Latest salary details for this employee.
+      </p>
+    </div>
+
+    @if (isEditMode && employeeId) {
+      <a
+        routerLink="/salary-management"
+        class="rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-100">
+        Manage Salary →
+      </a>
+    }
+  </div>
+
+  @if (!isEditMode) {
+    <div class="rounded-xl border border-blue-200 bg-blue-50 p-4">
+      <p class="text-sm text-blue-800">
+        Salary can be assigned after creating the employee.
+      </p>
+    </div>
+  }
+
+  @else if (loadingSalary) {
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center">
+      <div class="mx-auto h-7 w-7 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600"></div>
+      <p class="mt-2 text-sm text-slate-500">
+        Loading salary information...
+      </p>
+    </div>
+  }
+
+  @else if (salaryError) {
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+      <p class="text-sm text-red-700">
+        {{ salaryError }}
+      </p>
+    </div>
+  }
+
+  @else if (latestSalary) {
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+      <div class="mb-4 flex items-center justify-between">
+        <span class="text-sm font-semibold text-slate-700">
+          Current Salary Record
+        </span>
+
+        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+          Assigned
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div>
+          <p class="text-xs font-medium text-slate-500">
+            Base Salary
+          </p>
+          <p class="mt-1 text-lg font-bold text-slate-900">
+            {{ latestSalary.baseSalary | number:'1.2-2' }}
+            {{ latestSalary.currency }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs font-medium text-slate-500">
+            Bonus
+          </p>
+          <p class="mt-1 text-lg font-bold text-slate-900">
+            {{ latestSalary.bonus | number:'1.2-2' }}
+            {{ latestSalary.currency }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-xs font-medium text-slate-500">
+            Total Compensation
+          </p>
+          <p class="mt-1 text-lg font-bold text-emerald-700">
+            {{ latestSalary.totalCompensation | number:'1.2-2' }}
+            {{ latestSalary.currency }}
+          </p>
+        </div>
+
+      </div>
+
+      <div class="mt-5 border-t border-slate-200 pt-4">
+        <p class="text-xs font-medium text-slate-500">
+          Effective Date
+        </p>
+        <p class="mt-1 text-sm font-semibold text-slate-800">
+          {{ latestSalary.effectiveDate | date:'dd MMM yyyy' }}
+        </p>
+      </div>
+
+    </div>
+  }
+
+  @else {
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+      <p class="text-sm font-medium text-amber-800">
+        No salary assigned to this employee yet.
+      </p>
+      <p class="mt-1 text-xs text-amber-700">
+        You can assign a salary through Salary Management.
+      </p>
+    </div>
+  }
+
+</div>
+
+        <!-- Actions -->
+        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-200 pt-6 sm:flex-row">
+
+          <button
+            type="button"
+            routerLink="/employees"
+            [disabled]="submitting"
+            class="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50">
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="submitting || loadingEmployee"
+            class="rounded-xl bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
+
+            @if (submitting) {
+              Saving...
+            } @else {
+              {{ isEditMode ? 'Update Employee' : 'Save Employee' }}
+            }
+
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  }
+
+</div>

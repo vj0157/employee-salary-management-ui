@@ -1,0 +1,347 @@
+
+<div class="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+
+  <!-- Page Header -->
+ <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+
+  <div>
+    <a
+      routerLink="/dashboard"
+      class="mb-3 inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800">
+      ← Back to Dashboard
+    </a>
+
+    <h1 class="text-2xl font-bold text-slate-800">
+      Salary Management
+    </h1>
+
+    <p class="mt-1 text-sm text-slate-500">
+      Manage employee compensation and salary history.
+    </p>
+  </div>
+
+  <button
+    type="button"
+    (click)="openAddModal()"
+    [disabled]="!selectedEmployeeId"
+    class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50">
+    + Add Salary Record
+  </button>
+
+</div>
+
+  <!-- Messages -->
+  <div
+    *ngIf="successMessage"
+    class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+    {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="errorMessage && !showModal"
+    class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Employee Selection -->
+  <div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <label for="employeeSelect" class="mb-2 block text-sm font-semibold text-slate-700">
+      Select Employee
+    </label>
+
+     
+
+<select
+  id="employeeSelect"
+  name="employeeSelect"
+  [ngModel]="selectedEmployeeId"
+  (change)="onEmployeeChange($event)"
+  [disabled]="loadingEmployees || employees.length === 0"
+  class="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 sm:max-w-md">
+
+  <option value="" disabled>Select an employee</option>
+
+  <option
+    *ngFor="let employee of employees"
+    [value]="employee.id">
+
+    {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}
+
+  </option>
+</select>
+
+
+    <p *ngIf="loadingEmployees" class="mt-2 text-sm text-slate-500">
+      Loading employees...
+    </p>
+
+    <p *ngIf="!loadingEmployees && employees.length === 0" class="mt-2 text-sm text-slate-500">
+      No employees found. Add an employee first.
+    </p>
+  </div>
+
+  <!-- Selected Employee Details -->
+  <div
+    *ngIf="selectedEmployee"
+    class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+    <h2 class="mb-3 text-lg font-semibold text-slate-800">
+      Employee Details
+    </h2>
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        <p class="text-xs font-medium uppercase text-slate-400">Employee Name</p>
+        <p class="mt-1 font-medium text-slate-800">
+          {{ selectedEmployee.firstName }} {{ selectedEmployee.lastName }}
+        </p>
+      </div>
+
+      <div>
+        <p class="text-xs font-medium uppercase text-slate-400">Employee Code</p>
+        <p class="mt-1 font-medium text-slate-800">
+          {{ selectedEmployee.employeeCode }}
+        </p>
+      </div>
+
+      <div>
+        <p class="text-xs font-medium uppercase text-slate-400">Country</p>
+        <p class="mt-1 font-medium text-slate-800">
+          {{ selectedEmployee.country }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salary History -->
+ 
+<!-- Salary History -->
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+  <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-800">Salary History</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        Salary records for the selected employee.
+      </p>
+    </div>
+
+    <span *ngIf="loadingSalaries"
+      class="text-xs text-indigo-600">
+      Updating...
+    </span>
+  </div>
+
+  <!-- Initial loading -->
+  <div
+    *ngIf="loadingSalaries && salaries.length === 0"
+    class="p-10 text-center text-sm text-slate-500">
+    Loading salary records...
+  </div>
+
+  <!-- No records -->
+  <div
+    *ngIf="!loadingSalaries && selectedEmployeeId !== null && salaries.length === 0"
+    class="p-10 text-center">
+
+    <div class="mb-3 text-4xl">💰</div>
+
+    <h3 class="font-semibold text-slate-700">
+      No salary records found
+    </h3>
+
+    <p class="mt-1 text-sm text-slate-500">
+      Add a salary record for this employee to get started.
+    </p>
+  </div>
+
+  <!-- Salary Table: render whenever data exists -->
+  <div
+    *ngIf="salaries.length > 0"
+    class="overflow-x-auto">
+
+    <table class="w-full min-w-[750px] text-left text-sm">
+
+      <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+        <tr>
+          <th class="px-5 py-4">Effective Date</th>
+          <th class="px-5 py-4">Base Salary</th>
+          <th class="px-5 py-4">Bonus</th>
+          <th class="px-5 py-4">Total Compensation</th>
+          <th class="px-5 py-4">Currency</th>
+          <th class="px-5 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-100">
+
+        <tr *ngFor="let salary of salaries"
+            class="transition hover:bg-slate-50">
+
+          <td class="whitespace-nowrap px-5 py-4">
+            {{ salary.effectiveDate | date:'mediumDate' }}
+          </td>
+
+          <td class="whitespace-nowrap px-5 py-4">
+            {{ salary.baseSalary | number:'1.2-2' }}
+          </td>
+
+          <td class="whitespace-nowrap px-5 py-4">
+            {{ salary.bonus | number:'1.2-2' }}
+          </td>
+
+          <td class="whitespace-nowrap px-5 py-4 font-semibold">
+            {{ salary.totalCompensation | number:'1.2-2' }}
+          </td>
+
+          <td class="px-5 py-4">
+            <span class="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">
+              {{ salary.currency }}
+            </span>
+          </td>
+
+          <td class="whitespace-nowrap px-5 py-4 text-right">
+            <button
+              type="button"
+              (click)="openEditModal(salary)"
+              class="mr-3 font-medium text-indigo-600">
+              Edit
+            </button>
+
+            <button
+              type="button"
+              (click)="deleteSalary(salary)"
+              class="font-medium text-red-600">
+              Delete
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- Add / Edit Salary Modal -->
+<div
+  *ngIf="showModal"
+  class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-4">
+
+  <div class="my-auto w-full max-w-lg rounded-2xl bg-white shadow-xl">
+
+    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+      <div>
+        <h2 class="text-xl font-bold text-slate-800">
+          {{ editingSalaryId ? 'Edit Salary Record' : 'Add Salary Record' }}
+        </h2>
+        <p class="mt-1 text-sm text-slate-500">
+          Enter the employee's compensation details.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="closeModal()"
+        [disabled]="saving"
+        class="text-2xl text-slate-400 hover:text-slate-700 disabled:opacity-50">
+        &times;
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveSalary()" #salaryForm="ngForm" class="space-y-5 p-6">
+
+      <div>
+        <label for="baseSalary" class="mb-2 block text-sm font-medium text-slate-700">
+          Base Salary *
+        </label>
+        <input
+          id="baseSalary"
+          name="baseSalary"
+          type="number"
+          min="0"
+          step="0.01"
+          required
+          [(ngModel)]="form.baseSalary"
+          class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          placeholder="Enter base salary">
+      </div>
+
+      <div>
+        <label for="bonus" class="mb-2 block text-sm font-medium text-slate-700">
+          Bonus
+        </label>
+        <input
+          id="bonus"
+          name="bonus"
+          type="number"
+          min="0"
+          step="0.01"
+          required
+          [(ngModel)]="form.bonus"
+          class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          placeholder="Enter bonus amount">
+      </div>
+
+      <div>
+        <label for="currency" class="mb-2 block text-sm font-medium text-slate-700">
+          Currency Code *
+        </label>
+        <input
+          id="currency"
+          name="currency"
+          type="text"
+          required
+          minlength="3"
+          maxlength="3"
+          pattern="[A-Za-z]{3}"
+          [(ngModel)]="form.currency"
+          (ngModelChange)="form.currency = $event.toUpperCase()"
+          class="w-full rounded-lg border border-slate-300 px-4 py-3 uppercase outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          placeholder="Example: INR, USD, GBP">
+        <p class="mt-1 text-xs text-slate-400">
+          Enter a valid three-letter currency code.
+        </p>
+      </div>
+
+      <div>
+        <label for="effectiveDate" class="mb-2 block text-sm font-medium text-slate-700">
+          Effective Date *
+        </label>
+        <input
+          id="effectiveDate"
+          name="effectiveDate"
+          type="date"
+          required
+          [(ngModel)]="form.effectiveDate"
+          class="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+      </div>
+
+      <div
+        *ngIf="errorMessage"
+        class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ errorMessage }}
+      </div>
+
+      <div class="flex justify-end gap-3 border-t border-slate-100 pt-5">
+        <button
+          type="button"
+          (click)="closeModal()"
+          [disabled]="saving"
+          class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="saving || salaryForm.invalid"
+          class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ saving ? 'Saving...' : (editingSalaryId ? 'Update Salary' : 'Save Salary') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
