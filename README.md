@@ -1,59 +1,157 @@
-# EmployeeSalaryManagementUi
+# Employee Salary Management System — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.5.
+Angular frontend for the Employee Salary Management System built for the Incubyte engineering assessment.
 
-## Development server
+The application provides an HR Manager interface for managing employees, maintaining salary history, and viewing salary-related dashboard statistics.
 
-To start a local development server, run:
+## Features
+
+- Dashboard with live employee and salary statistics
+- Employee management
+  - View employees
+  - Search employees
+  - Filter by country
+  - Server-side pagination
+  - Sorting
+  - Add employee
+  - Edit employee
+  - Delete employee
+- Salary management
+  - View salary history
+  - Add salary records
+  - Edit salary records
+  - Delete salary records
+  - Calculate total compensation as base salary + bonus
+- Form validation and error handling
+- Responsive layout
+- Angular routing
+- REST API integration with Spring Boot backend
+
+## Technology Stack
+
+- Angular 22
+- TypeScript
+- Tailwind CSS
+- RxJS
+- HTML/CSS
+- Vitest
+- REST APIs
+
+## Application Structure
+
+```text
+src/
+├── app/
+│   ├── core/
+│   │   └── services/
+│   │       ├── dashboard.ts
+│   │       ├── employee.service.ts
+│   │       └── salary.service.ts
+│   │
+│   ├── features/
+│   │   ├── dashboard/
+│   │   ├── employees/
+│   │   │   ├── employee-form/
+│   │   │   └── employee-list/
+│   │   └── salaries/
+│   │       └── salary-management/
+│   │
+│   ├── app.config.ts
+│   ├── app.routes.ts
+│   ├── app.html
+│   └── app.ts
+│
+├── index.html
+├── main.ts
+└── styles.css
+```
+
+## Prerequisites
+
+- Node.js
+- npm
+- Angular CLI
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+npm install
+```
+
+## Development Server
+
+Start the Angular development server:
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```text
+http://localhost:4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The frontend expects the Spring Boot backend to be available at:
 
-```bash
-ng generate --help
+```text
+http://localhost:8080
 ```
 
-## Building
+## Production Build
 
-To build the project run:
+Create a production build:
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+The generated build files are placed in the `dist/` directory.
 
-## Running unit tests
+## Unit Tests
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Run the frontend unit tests:
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+The project uses Vitest through the Angular testing configuration.
 
-For end-to-end (e2e) testing, run:
+## Backend Dependency
 
-```bash
-ng e2e
+The frontend communicates with the Employee Salary Management System Spring Boot backend through REST APIs.
+
+Backend repository:
+
+https://github.com/vj0157/employee-salary-management
+
+Backend base URL used by the application:
+
+```text
+http://localhost:8080/api
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Main API Areas
 
-## Additional Resources
+The frontend consumes APIs for:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Employee management
+- Employee search and filtering
+- Salary history
+- Salary CRUD operations
+- Dashboard summary
+- Country distribution
+- Salary statistics
+
+## Performance
+
+The employee list uses server-side pagination and filtering so that the UI remains responsive when working with approximately 10,000 employee records.
+
+## Assessment Notes
+
+This frontend is part of the Incubyte Employee Salary Management System take-home assessment.
+
+The application focuses on the requested employee and salary management workflow while deliberately keeping payroll processing, tax calculation, currency conversion, authentication/authorization, and other out-of-scope HR functionality outside the implementation.
